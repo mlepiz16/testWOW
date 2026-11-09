@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WOW Party — Estado de hoy · Demo</title>
+<style>
+:root{--bg:#f7f3ff;--ink:#25183a;--muted:#746982;--brand:#7140c8;--brand2:#9b6ce8;--line:#e8ddf6;--ok:#157a40;--warn:#ad6200;--bad:#b32727}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:900px;margin:auto;padding:22px}.demo{background:#fff4c9;border:1px solid #ebd36e;padding:10px 14px;border-radius:12px;margin-bottom:14px;font-size:14px}
+header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:16px}.brand h1{margin:0;font-size:30px}.brand p{margin:3px 0;color:var(--muted)}
+.badge{padding:8px 13px;border-radius:999px;font-weight:800}.hero{padding:28px;border-radius:24px;color:white;background:linear-gradient(135deg,var(--brand),var(--brand2))}
+.hero h2{margin:0 0 10px;font-size:34px}.notice{margin-top:16px;padding:14px;border-radius:14px;background:rgba(255,255,255,.13)}
+.cta{display:inline-block;margin-top:16px;text-decoration:none;background:#20b95b;color:white;padding:12px 17px;border-radius:12px;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.card,.promo{background:white;border:1px solid var(--line);border-radius:18px;padding:18px}
+.card h3{margin:0 0 6px}.card p{margin:0;color:var(--muted)}.pill{display:inline-block;margin-top:10px;padding:6px 9px;border-radius:999px;font-size:13px;font-weight:800}
+.ok{background:#e8f7ee;color:var(--ok)}.warn{background:#fff1da;color:var(--warn)}.bad{background:#fde8e8;color:var(--bad)}.promo{margin-top:14px}
+.small{font-size:13px;color:var(--muted);margin-top:14px}footer{text-align:center;color:var(--muted);font-size:13px;margin:26px 0}
+@media(max-width:720px){header{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.hero h2{font-size:28px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<div class="demo">Demo no oficial basada en WOW Party. Datos simulados para validar el flujo operativo.</div>
+<header><div class="brand"><h1>WOW Party</h1><p>Información antes de venir</p></div><div id="estado" class="badge">Cargando…</div></header>
+<section class="hero">
+<h2>Estado de hoy</h2>
+<p><strong>Horario:</strong> <span id="horario">—</span></p>
+<div class="notice"><strong id="aviso">Información de hoy</strong><div id="nota">—</div></div>
+<a class="cta" href="https://wa.me/50683687330" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+</section>
+<section class="grid">
+<article class="card"><h3>Área de juegos</h3><p>Disponibilidad actual</p><span id="juegos" class="pill">—</span></article>
+<article class="card"><h3>Salón Nova</h3><p>Disponibilidad actual</p><span id="nova" class="pill">—</span></article>
+<article class="card"><h3>Segundo salón</h3><p>Disponibilidad actual</p><span id="segundo" class="pill">—</span></article>
+</section>
+<section class="promo"><strong>Promoción vigente</strong><p id="promocion">—</p></section>
+<div class="small">Fuente: <code>data/status.json</code> editado desde Pages CMS.</div>
+<footer>Prototipo Modo Norte</footer>
+</main>
+<script>
+function cls(v){const t=(v||"").toLowerCase();if(t.includes("no disponible")||t.includes("cerrado"))return"pill bad";if(t.includes("reservado")||t.includes("limitada"))return"pill warn";return"pill ok";}
+function render(d){const e=document.getElementById("estado");e.textContent=d.estado||"Sin estado";e.className="badge "+((d.estado||"").toLowerCase().includes("cerrado")?"bad":"ok");for(const k of ["horario","aviso","nota","juegos","nova","segundo","promocion"]){document.getElementById(k).textContent=d[k]||"—";}for(const k of ["juegos","nova","segundo"])document.getElementById(k).className=cls(d[k]);}
+fetch("./data/status.json?ts="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(render).catch(()=>render({estado:"Sin datos",horario:"—",aviso:"No se pudo leer el estado",nota:"La demo debe servirse desde hosting.",juegos:"—",nova:"—",segundo:"—",promocion:"—"}));
+</script>
+</body></html>
