@@ -1,7 +1,7 @@
 {
   "promocion": "2x1 miércoles",
   "nota": "Consultá antes de venir si necesitás usar un salón específico.",
-  "override_general": "Forzar cerrado",
+  "override_general": "Automático",
   "override_juegos": "Automático",
   "override_nova": "Automático",
   "override_segundo": "Automático",
