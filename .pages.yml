@@ -11,64 +11,8 @@ content:
       rename: false
       delete: false
     fields:
-      - name: estado
-        label: Estado general
-        type: select
-        required: true
-        options:
-          values: [Abierto, Cerrado, Horario especial]
-      - name: horario
-        label: Horario de hoy
-        type: select
-        required: true
-        options:
-          values:
-            - 10:00 a. m. – 7:00 p. m.
-            - 11:00 a. m. – 7:00 p. m.
-            - 2:00 p. m. – 8:00 p. m.
-            - Consultar por WhatsApp
-      - name: juegos
-        label: Área de juegos
-        type: select
-        required: true
-        options:
-          values: [Disponible, Disponibilidad limitada, No disponible]
-      - name: nova
-        label: Salón Nova
-        type: select
-        required: true
-        options:
-          values:
-            - Disponible
-            - Reservado esta mañana
-            - Reservado esta tarde
-            - Reservado todo el día
-            - No disponible
-      - name: segundo
-        label: Segundo salón
-        type: select
-        required: true
-        options:
-          values:
-            - Disponible
-            - Reservado esta mañana
-            - Reservado esta tarde
-            - Reservado todo el día
-            - No disponible
-      - name: aviso
-        label: Aviso operativo
-        type: select
-        required: true
-        options:
-          values:
-            - Sin avisos especiales
-            - Hay un evento privado esta mañana
-            - Hay un evento privado esta tarde
-            - Hay un evento privado esta noche
-            - Mantenimiento parcial
-            - Horario especial
       - name: promocion
-        label: Promoción
+        label: Promoción vigente
         type: select
         required: true
         options:
@@ -77,10 +21,93 @@ content:
             - 2 horas + snack por ₡10.000
             - 2x1 miércoles
             - Consultar promociones por WhatsApp
+
       - name: nota
         label: Nota especial
         type: string
         required: false
-        description: Único campo libre; usar solo cuando una opción predefinida no sea suficiente.
+        description: Texto opcional visible para clientes.
         options:
           maxlength: 140
+
+      - name: override_general
+        label: Excepción general
+        type: select
+        required: true
+        description: Dejá Automático salvo cierre o apertura excepcional.
+        options:
+          values:
+            - Automático
+            - Forzar abierto
+            - Forzar cerrado
+
+      - name: override_juegos
+        label: Excepción · Área de juegos
+        type: select
+        required: true
+        options:
+          values:
+            - Automático
+            - Forzar disponible
+            - Forzar no disponible
+
+      - name: override_nova
+        label: Excepción · Salón Nova
+        type: select
+        required: true
+        options:
+          values:
+            - Automático
+            - Forzar disponible
+            - Forzar no disponible
+
+      - name: override_segundo
+        label: Excepción · Segundo salón
+        type: select
+        required: true
+        options:
+          values:
+            - Automático
+            - Forzar disponible
+            - Forzar no disponible
+
+      - name: reservas
+        label: Reservaciones programadas
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{fecha} · {espacio} · {inicio}–{fin}"
+        fields:
+          - name: fecha
+            label: Fecha
+            type: string
+            required: true
+            description: Formato AAAA-MM-DD.
+            pattern:
+              regex: "^\\d{4}-\\d{2}-\\d{2}$"
+              message: "Usá formato AAAA-MM-DD"
+          - name: espacio
+            label: Espacio reservado
+            type: select
+            required: true
+            options:
+              values:
+                - Salón Nova
+                - Segundo salón
+          - name: inicio
+            label: Hora de inicio
+            type: string
+            required: true
+            description: Formato 24 horas HH:MM.
+            pattern:
+              regex: "^([01]\\d|2[0-3]):[0-5]\\d$"
+              message: "Usá formato HH:MM, por ejemplo 15:00"
+          - name: fin
+            label: Hora de finalización
+            type: string
+            required: true
+            description: Formato 24 horas HH:MM.
+            pattern:
+              regex: "^([01]\\d|2[0-3]):[0-5]\\d$"
+              message: "Usá formato HH:MM, por ejemplo 18:00"
