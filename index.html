@@ -21,26 +21,101 @@ header{display:flex;justify-content:space-between;gap:12px;align-items:center;ma
 </head>
 <body>
 <main class="wrap">
-<div class="demo">Demo no oficial basada en WOW Party. Datos simulados para validar el flujo operativo.</div>
+<div class="demo">Demo no oficial basada en WOW Party. Reservas mostradas son simuladas para validar automatización.</div>
 <header><div class="brand"><h1>WOW Party</h1><p>Información antes de venir</p></div><div id="estado" class="badge">Cargando…</div></header>
 <section class="hero">
 <h2>Estado de hoy</h2>
-<p><strong>Horario:</strong> <span id="horario">—</span></p>
+<p><strong id="horario">Calculando horario…</strong></p>
 <div class="notice"><strong id="aviso">Información de hoy</strong><div id="nota">—</div></div>
 <a class="cta" href="https://wa.me/50683687330" target="_blank" rel="noopener">Consultar por WhatsApp</a>
 </section>
 <section class="grid">
-<article class="card"><h3>Área de juegos</h3><p>Disponibilidad actual</p><span id="juegos" class="pill">—</span></article>
-<article class="card"><h3>Salón Nova</h3><p>Disponibilidad actual</p><span id="nova" class="pill">—</span></article>
-<article class="card"><h3>Segundo salón</h3><p>Disponibilidad actual</p><span id="segundo" class="pill">—</span></article>
+<article class="card"><h3>Área de juegos</h3><p>Disponibilidad actual</p><span id="juegos" class="pill">—</span><p id="juegosDetalle" class="small"></p></article>
+<article class="card"><h3>Salón Nova</h3><p>Disponibilidad actual</p><span id="nova" class="pill">—</span><p id="novaDetalle" class="small"></p></article>
+<article class="card"><h3>Segundo salón</h3><p>Disponibilidad actual</p><span id="segundo" class="pill">—</span><p id="segundoDetalle" class="small"></p></article>
 </section>
 <section class="promo"><strong>Promoción vigente</strong><p id="promocion">—</p></section>
-<div class="small">Fuente: <code>data/status.json</code> editado desde Pages CMS.</div>
+<div class="small">Horario automático en zona horaria de Costa Rica. Las excepciones manuales tienen prioridad.</div>
 <footer>Prototipo Modo Norte</footer>
 </main>
 <script>
+const TZ="America/Costa_Rica";
+const schedule={
+  0:{open:"10:00",close:"19:00"},
+  1:null,
+  2:{open:"11:00",close:"19:00"},
+  3:{open:"11:00",close:"19:00"},
+  4:{open:"11:00",close:"19:00"},
+  5:{open:"11:00",close:"19:00"},
+  6:{open:"10:00",close:"19:00"}
+};
+const dayNames=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+
+function crNow(){
+  const parts=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23",weekday:"short"}).formatToParts(new Date());
+  const v=Object.fromEntries(parts.map(p=>[p.type,p.value]));
+  const map={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+  return {date:`${v.year}-${v.month}-${v.day}`,time:`${v.hour}:${v.minute}`,day:map[v.weekday]};
+}
+function toMin(t){const [h,m]=t.split(":").map(Number);return h*60+m;}
+function pretty(t){const [hh,mm]=t.split(":").map(Number);const ap=hh>=12?"p. m.":"a. m.";const h=((hh+11)%12)+1;return `${h}:${String(mm).padStart(2,"0")} ${ap}`;}
 function cls(v){const t=(v||"").toLowerCase();if(t.includes("no disponible")||t.includes("cerrado"))return"pill bad";if(t.includes("reservado")||t.includes("limitada"))return"pill warn";return"pill ok";}
-function render(d){const e=document.getElementById("estado");e.textContent=d.estado||"Sin estado";e.className="badge "+((d.estado||"").toLowerCase().includes("cerrado")?"bad":"ok");for(const k of ["horario","aviso","nota","juegos","nova","segundo","promocion"]){document.getElementById(k).textContent=d[k]||"—";}for(const k of ["juegos","nova","segundo"])document.getElementById(k).className=cls(d[k]);}
-fetch("./data/status.json?ts="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(render).catch(()=>render({estado:"Sin datos",horario:"—",aviso:"No se pudo leer el estado",nota:"La demo debe servirse desde hosting.",juegos:"—",nova:"—",segundo:"—",promocion:"—"}));
+function nextOpen(day){
+  for(let i=1;i<=7;i++){const d=(day+i)%7;if(schedule[d])return {day:d,...schedule[d]};}
+  return null;
+}
+function reservationState(data,space,now){
+  const todays=(data.reservas||[]).filter(r=>r.fecha===now.date&&r.espacio===space).sort((a,b)=>a.inicio.localeCompare(b.inicio));
+  const n=toMin(now.time);
+  const active=todays.find(r=>n>=toMin(r.inicio)&&n<toMin(r.fin));
+  if(active)return {label:`Reservado hasta ${pretty(active.fin)}`,detail:`Reserva ${pretty(active.inicio)}–${pretty(active.fin)}`};
+  const upcoming=todays.find(r=>n<toMin(r.inicio));
+  if(upcoming)return {label:"Disponible ahora",detail:`Reservado hoy ${pretty(upcoming.inicio)}–${pretty(upcoming.fin)}`};
+  return {label:"Disponible",detail:"Sin reservas programadas para hoy"};
+}
+function applyOverride(auto,override){
+  if(override==="Forzar disponible")return {label:"Disponible",detail:"Estado definido manualmente"};
+  if(override==="Forzar no disponible")return {label:"No disponible",detail:"Estado definido manualmente"};
+  return auto;
+}
+function render(data){
+  const now=crNow(), hours=schedule[now.day], n=toMin(now.time);
+  let open=!!hours&&n>=toMin(hours.open)&&n<toMin(hours.close);
+  if(data.override_general==="Forzar abierto")open=true;
+  if(data.override_general==="Forzar cerrado")open=false;
+
+  const estado=document.getElementById("estado");
+  if(open){
+    estado.textContent="Abierto ahora";estado.className="badge ok";
+    document.getElementById("horario").textContent=hours?`Hoy ${pretty(hours.open)}–${pretty(hours.close)}`:"Apertura excepcional";
+  }else{
+    estado.textContent="Cerrado ahora";estado.className="badge bad";
+    if(hours&&n<toMin(hours.open))document.getElementById("horario").textContent=`Abre hoy a las ${pretty(hours.open)}`;
+    else {const nx=nextOpen(now.day);document.getElementById("horario").textContent=nx?`Próxima apertura: ${dayNames[nx.day]} ${pretty(nx.open)}`:"Consultar horario";}
+  }
+
+  document.getElementById("nota").textContent=data.nota||"Sin avisos especiales.";
+  document.getElementById("aviso").textContent=(data.override_general&&data.override_general!=="Automático")?"Horario excepcional activo":"Información calculada automáticamente";
+  document.getElementById("promocion").textContent=data.promocion||"Sin promoción vigente";
+
+  const gameAuto=open?{label:"Disponible",detail:"Según horario general"}:{label:"Cerrado",detail:"Fuera del horario de atención"};
+  const novaAuto=open?reservationState(data,"Salón Nova",now):{label:"Cerrado",detail:"Fuera del horario de atención"};
+  const segundoAuto=open?reservationState(data,"Segundo salón",now):{label:"Cerrado",detail:"Fuera del horario de atención"};
+
+  const states={
+    juegos:applyOverride(gameAuto,data.override_juegos),
+    nova:applyOverride(novaAuto,data.override_nova),
+    segundo:applyOverride(segundoAuto,data.override_segundo)
+  };
+  for(const k of ["juegos","nova","segundo"]){
+    document.getElementById(k).textContent=states[k].label;
+    document.getElementById(k).className=cls(states[k].label);
+    document.getElementById(k+"Detalle").textContent=states[k].detail;
+  }
+}
+fetch("./data/status.json?ts="+Date.now(),{cache:"no-store"})
+  .then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})
+  .then(render)
+  .catch(()=>{document.getElementById("estado").textContent="Sin datos";document.getElementById("estado").className="badge bad";document.getElementById("horario").textContent="No se pudo cargar la información";});
 </script>
 </body></html>
