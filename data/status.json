@@ -1,7 +1,7 @@
 {
   "promocion": "2 horas + snack por ₡10.000",
   "nota": "Consultá antes de venir si necesitás usar un salón específico.",
-  "override_general": "Automático",
+  "override_general": "Forzar abierto",
   "override_juegos": "Automático",
   "override_nova": "Automático",
   "override_segundo": "Automático",
@@ -17,6 +17,12 @@
       "espacio": "Segundo salón",
       "inicio": "12:00",
       "fin": "16:00"
+    },
+    {
+      "fecha": "2026-11-09",
+      "espacio": "Salón Nova",
+      "inicio": "20:00",
+      "fin": "21:00"
     }
   ]
 }
