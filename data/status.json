@@ -1,10 +1,10 @@
 {
   "estado": "Abierto",
   "horario": "10:00 a. m. – 7:00 p. m.",
-  "juegos": "Disponible",
-  "nova": "Disponible",
+  "juegos": "No disponible",
+  "nova": "Reservado todo el día",
   "segundo": "Disponible",
   "aviso": "Hay un evento privado esta tarde",
-  "promocion": "2 horas + snack por ₡10.000",
+  "promocion": "2x1 miércoles",
   "nota": "Consultá antes de venir si necesitás usar un salón específico."
 }
