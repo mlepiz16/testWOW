@@ -12,16 +12,19 @@ header{display:flex;justify-content:space-between;gap:12px;align-items:center;ma
 .badge{padding:8px 13px;border-radius:999px;font-weight:800}.hero{padding:28px;border-radius:24px;color:white;background:linear-gradient(135deg,var(--brand),var(--brand2))}
 .hero h2{margin:0 0 10px;font-size:34px}.notice{margin-top:16px;padding:14px;border-radius:14px;background:rgba(255,255,255,.13)}
 .cta{display:inline-block;margin-top:16px;text-decoration:none;background:#20b95b;color:white;padding:12px 17px;border-radius:12px;font-weight:800}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.card,.promo{background:white;border:1px solid var(--line);border-radius:18px;padding:18px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.card,.promo,.upcoming{background:white;border:1px solid var(--line);border-radius:18px;padding:18px}
 .card h3{margin:0 0 6px}.card p{margin:0;color:var(--muted)}.pill{display:inline-block;margin-top:10px;padding:6px 9px;border-radius:999px;font-size:13px;font-weight:800}
-.ok{background:#e8f7ee;color:var(--ok)}.warn{background:#fff1da;color:var(--warn)}.bad{background:#fde8e8;color:var(--bad)}.promo{margin-top:14px}
-.small{font-size:13px;color:var(--muted);margin-top:14px}footer{text-align:center;color:var(--muted);font-size:13px;margin:26px 0}
-@media(max-width:720px){header{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.hero h2{font-size:28px}}
+.ok{background:#e8f7ee;color:var(--ok)}.warn{background:#fff1da;color:var(--warn)}.bad{background:#fde8e8;color:var(--bad)}.promo,.upcoming{margin-top:14px}
+.small{font-size:13px;color:var(--muted);margin-top:14px}.upcoming h2{margin:0 0 6px;font-size:22px}.upcoming>p{margin:0 0 14px;color:var(--muted)}
+.event-list{display:grid;gap:10px}.event{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:13px 0;border-top:1px solid var(--line)}.event:first-child{border-top:0;padding-top:0}
+.event-main{min-width:0}.event-title{font-weight:800;margin-bottom:3px}.event-meta{font-size:14px;color:var(--muted)}.event-type{white-space:nowrap;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}.public{background:#efe7ff;color:#6534b5}.private{background:#fff1da;color:var(--warn)}
+footer{text-align:center;color:var(--muted);font-size:13px;margin:26px 0}
+@media(max-width:720px){header{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.hero h2{font-size:28px}.event{flex-direction:column;gap:8px}.event-type{white-space:normal}}
 </style>
 </head>
 <body>
 <main class="wrap">
-<div class="demo">Demo no oficial basada en WOW Party. Reservas mostradas son simuladas para validar automatización.</div>
+<div class="demo">Demo no oficial basada en WOW Party. Reservas y eventos mostrados son simulados para validar automatización.</div>
 <header><div class="brand"><h1>WOW Party</h1><p>Información antes de venir</p></div><div id="estado" class="badge">Cargando…</div></header>
 <section class="hero">
 <h2>Estado de hoy</h2>
@@ -33,6 +36,11 @@ header{display:flex;justify-content:space-between;gap:12px;align-items:center;ma
 <article class="card"><h3>Área de juegos</h3><p>Disponibilidad actual</p><span id="juegos" class="pill">—</span><p id="juegosDetalle" class="small"></p></article>
 <article class="card"><h3>Salón Nova</h3><p>Disponibilidad actual</p><span id="nova" class="pill">—</span><p id="novaDetalle" class="small"></p></article>
 <article class="card"><h3>Segundo salón</h3><p>Disponibilidad actual</p><span id="segundo" class="pill">—</span><p id="segundoDetalle" class="small"></p></article>
+</section>
+<section class="upcoming">
+<h2>Próximos eventos y reservas</h2>
+<p>Planificá tu visita con anticipación.</p>
+<div id="eventos" class="event-list"><div class="event-meta">Cargando próximos eventos…</div></div>
 </section>
 <section class="promo"><strong>Promoción vigente</strong><p id="promocion">—</p></section>
 <div class="small">Horario automático en zona horaria de Costa Rica. Las excepciones manuales tienen prioridad.</div>
@@ -50,6 +58,7 @@ const schedule={
   6:{open:"10:00",close:"19:00"}
 };
 const dayNames=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const monthNames=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
 
 function crNow(){
   const parts=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23",weekday:"short"}).formatToParts(new Date());
@@ -59,6 +68,12 @@ function crNow(){
 }
 function toMin(t){const [h,m]=t.split(":").map(Number);return h*60+m;}
 function pretty(t){const [hh,mm]=t.split(":").map(Number);const ap=hh>=12?"p. m.":"a. m.";const h=((hh+11)%12)+1;return `${h}:${String(mm).padStart(2,"0")} ${ap}`;}
+function prettyDate(s){
+  const [y,m,d]=s.split("-").map(Number);
+  const dt=new Date(Date.UTC(y,m-1,d));
+  const wd=new Intl.DateTimeFormat("es-CR",{weekday:"short",timeZone:"UTC"}).format(dt).replace(".","");
+  return `${wd} ${d} ${monthNames[m-1]}`;
+}
 function cls(v){const t=(v||"").toLowerCase();if(t.includes("no disponible")||t.includes("cerrado"))return"pill bad";if(t.includes("reservado")||t.includes("limitada"))return"pill warn";return"pill ok";}
 function nextOpen(day){
   for(let i=1;i<=7;i++){const d=(day+i)%7;if(schedule[d])return {day:d,...schedule[d]};}
@@ -77,6 +92,28 @@ function applyOverride(auto,override){
   if(override==="Forzar disponible")return {label:"Disponible",detail:"Estado definido manualmente"};
   if(override==="Forzar no disponible")return {label:"No disponible",detail:"Estado definido manualmente"};
   return auto;
+}
+function renderUpcoming(data,now){
+  const privateEvents=(data.reservas||[])
+    .filter(r=>r.fecha>now.date || (r.fecha===now.date && toMin(r.fin)>toMin(now.time)))
+    .map(r=>({date:r.fecha,start:r.inicio,end:r.fin,title:`${r.espacio} reservado`,type:"Reserva privada",kind:"private"}));
+  const publicEvents=(data.eventos_publicos||[])
+    .filter(e=>e.fecha>now.date || (e.fecha===now.date && toMin(e.fin)>toMin(now.time)))
+    .map(e=>({date:e.fecha,start:e.inicio,end:e.fin,title:e.titulo,type:"Evento público",kind:"public"}));
+  const events=[...privateEvents,...publicEvents]
+    .sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start))
+    .slice(0,5);
+
+  const box=document.getElementById("eventos");
+  if(!events.length){box.innerHTML='<div class="event-meta">No hay eventos o reservas próximas publicadas.</div>';return;}
+  box.innerHTML=events.map(e=>`
+    <div class="event">
+      <div class="event-main">
+        <div class="event-title">${e.title}</div>
+        <div class="event-meta">${prettyDate(e.date)} · ${pretty(e.start)}–${pretty(e.end)}</div>
+      </div>
+      <span class="event-type ${e.kind}">${e.type}</span>
+    </div>`).join("");
 }
 function render(data){
   const now=crNow(), hours=schedule[now.day], n=toMin(now.time);
@@ -112,6 +149,7 @@ function render(data){
     document.getElementById(k).className=cls(states[k].label);
     document.getElementById(k+"Detalle").textContent=states[k].detail;
   }
+  renderUpcoming(data,now);
 }
 fetch("./data/status.json?ts="+Date.now(),{cache:"no-store"})
   .then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})
