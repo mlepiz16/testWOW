@@ -30,5 +30,13 @@
       "inicio": "15:00",
       "fin": "15:05"
     }
+  ],
+  "eventos_publicos": [
+    {
+      "fecha": "2026-11-15",
+      "titulo": "Actividad especial de temporada",
+      "inicio": "15:00",
+      "fin": "17:00"
+    }
   ]
 }
