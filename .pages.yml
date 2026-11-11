@@ -111,3 +111,42 @@ content:
             pattern:
               regex: "^([01]\\d|2[0-3]):[0-5]\\d$"
               message: "Usá formato HH:MM, por ejemplo 18:00"
+
+      - name: eventos_publicos
+        label: Próximos eventos públicos
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{fecha} · {titulo} · {inicio}–{fin}"
+        fields:
+          - name: fecha
+            label: Fecha
+            type: string
+            required: true
+            description: Formato AAAA-MM-DD.
+            pattern:
+              regex: "^\\d{4}-\\d{2}-\\d{2}$"
+              message: "Usá formato AAAA-MM-DD"
+          - name: titulo
+            label: Nombre del evento
+            type: string
+            required: true
+            options:
+              maxlength: 80
+          - name: inicio
+            label: Hora de inicio
+            type: string
+            required: true
+            description: Formato 24 horas HH:MM.
+            pattern:
+              regex: "^([01]\\d|2[0-3]):[0-5]\\d$"
+              message: "Usá formato HH:MM, por ejemplo 15:00"
+          - name: fin
+            label: Hora de finalización
+            type: string
+            required: true
+            description: Formato 24 horas HH:MM.
+            pattern:
+              regex: "^([01]\\d|2[0-3]):[0-5]\\d$"
+              message: "Usá formato HH:MM, por ejemplo 17:00"
