@@ -1,9 +1,10 @@
 # WOW Party — Experimento de disponibilidad operativa
 
 **Proyecto:** Brete Tito 2026 / Modo Norte  
-**Estado:** Technical validation PASS · Commercial problem validation: PARTIAL PASS  
+**Estado:** CERRADO · Technical validation PASS · Commercial opportunity STOP  
 **Fecha de validación técnica:** 2026-11-09 / 2026-11-10  
 **Primera visita comercial:** 2026-11-11  
+**Cierre comercial:** 2026-11-17  
 **Naturaleza:** Prototipo demostrativo no oficial. WOW Party no es cliente de Modo Norte en esta etapa.
 
 ## 1. Problema observado
@@ -132,26 +133,56 @@ Hay apertura, solicitud de contacto y autorización implícita para seguimiento,
 **Integración técnica:** NO VALIDADA.  
 No debe construirse integración con redes sociales ni con la aplicación de reservas antes de conocer la herramienta real y hablar con el decisor.
 
-## 9. Estado actual
+## 9. Segunda visita y cierre comercial — 2026-11-17
+
+Mario conversó con el esposo de Adriana, dueño y decisor de WOW Party.
+
+### Evidencia obtenida
+
+- El decisor es ingeniero en sistemas.
+- WOW ya tiene un proyecto en marcha para desarrollar una página web propia.
+- Ese proyecto contempla precisamente la integración operativa para informar disponibilidad de la sala.
+- La conversación terminó con un rechazo comercial cortés; no existe oportunidad actual para Modo Norte.
+
+### Interpretación
+
+**Problema operativo:** VALIDADO.  
+La necesidad identificada coincide con una solución que el propio negocio ya decidió construir.
+
+**Solución conceptual:** VALIDADA INDIRECTAMENTE.  
+La dirección del proyecto interno de WOW coincide con la hipótesis de Modo Norte: web propia + disponibilidad operativa.
+
+**Oportunidad comercial para Modo Norte:** STOP.  
+El negocio tiene capacidad técnica interna y una solución ya en desarrollo.
+
+**Disposición a pagar a Modo Norte:** NO VALIDADA / oportunidad cerrada.
+
+## 10. Estado final
 
 **TECHNICAL VALIDATION: PASS**  
-**PROBLEM VALIDATION: PARTIAL PASS / STRONG SIGNAL**  
-**DECISION-MAKER VALIDATION: PENDING**  
-**WILLINGNESS TO PAY: PENDING**
+**PROBLEM VALIDATION: PASS**  
+**SOLUTION DIRECTION: VALIDATED INDIRECTLY**  
+**COMMERCIAL OPPORTUNITY: STOP**  
+**REASON:** solución interna ya en desarrollo.
 
-## 10. Próximo gate
+## 11. Aprendizajes
 
-Conseguir conversación con el dueño/decisor.
+1. Validar el problema antes de construir.
+2. Llegar al decisor antes de invertir desarrollo significativo.
+3. Un usuario/interesado puede confirmar utilidad sin tener poder de compra.
+4. El cliente ideal necesita no solo el problema, sino también ausencia de una solución interna suficiente.
+5. Antes de proponer una solución, investigar proceso actual, herramientas, responsable y proyectos en curso.
+6. No convertir una demo útil en una excusa para buscar negocios que encajen artificialmente con ella.
 
-Objetivo:
-1. confirmar que él reconoce el problema;
-2. mostrar la demo si Adriana ya le comentó la idea;
-3. identificar la aplicación real usada para reservas;
-4. entender qué significa para ellos “integrar con Facebook o Instagram”;
-5. determinar si quieren una solución independiente para WOW;
-6. obtener permiso para preparar una propuesta concreta;
-7. solo entonces definir alcance y precio.
+## 12. Regla para próximos experimentos
 
-## 11. Regla de alcance
+Secuencia obligatoria:
 
-No añadir nuevas funciones, integración con redes sociales, integración con la aplicación de reservas, nueva web de WOW, pagos, CRM, NFC u otros componentes hasta obtener evidencia del decisor que los justifique.
+```
+fricción observable → conversación de descubrimiento → problema confirmado
+→ decisor → solución propuesta → precio → construcción
+```
+
+No construir nuevas funciones ni demos personalizadas antes de confirmar problema y decisor.
+
+La demo WOW queda congelada como pieza demostrativa de capacidad técnica y aprendizaje del experimento.
